@@ -1,6 +1,6 @@
 import random
 
-QUEEN_NUM = 10
+QUEEN_NUM = 8
 INF = 10000000011111111
 K_BEST  = 4
 
@@ -22,7 +22,7 @@ def show_state(state) :
                 print('0',end = ' ')
         print()
 
-def get_fitness (state,a,b) :
+def get_fitness (state,a = 0,b = QUEEN_NUM) :
     cnt = 0
     for i in range(a,b) :
         for j in range(i + 1,b):
@@ -51,31 +51,31 @@ def compare(elm) :
 
 
 def GEN_ALGO ():
+
     #CrossOver 
-
-    for i in range(K_BEST) :
+    for i in range(0,K_BEST,2) :
         random_selection = random.randint(0,QUEEN_NUM - 1)
+        k_best_state.append(cross(k_best_state[i+1],k_best_state[i],random_selection))
         k_best_state.append(cross(k_best_state[i],k_best_state[i+1],random_selection))
-        k_best_state.insert(0,cross(k_best_state[i+1],k_best_state[i],random_selection))
-
-
+        
     # Mutation
-    for i in range(K_BEST) :
-        for ii in  range(20) :
-            random_selection = random.randint(0,QUEEN_NUM - 1)
-            mn = INF
-            for j in range(QUEEN_NUM) :
-                k_best_state[i][random_selection] = j
-                temp = get_fitness(k_best_state[i],0,QUEEN_NUM)
-                if temp < mn :
-                    mn = temp
-                    idd = j  
-            k_best_state[i][random_selection] = idd
-
+    for i in range(2*K_BEST) :
+        random_selection = random.randint(0,QUEEN_NUM - 1)
+        mn = INF
+        for j in range(QUEEN_NUM) :
+            k_best_state[i][random_selection] = j
+            temp = get_fitness(k_best_state[i],0,QUEEN_NUM)
+            if temp < mn :
+                mn = temp
+                idd = j  
+        k_best_state[i][random_selection] = idd
 
     k_best_state.sort(key = compare)
-    for i in range(0,K_BEST // 2):
-       k_best_state.pop()
+
+    while k_best_state.__len__() > K_BEST:
+       k_best_state.pop()   
+
+
 
 def main():
     for i in range(K_BEST) :
@@ -84,12 +84,11 @@ def main():
     isAns = 0
     while True:
         GEN_ALGO()
-        print("##############")
         for i in range(K_BEST):
-            print(get_fitness(k_best_state[i],0,QUEEN_NUM))
+            print("number of Queens in engage : ",get_fitness(k_best_state[i],0,QUEEN_NUM))
             # show_state(k_best_state[i])
             if check_solution(k_best_state[i]) == True : 
-                print(QUEEN_NUM , ' Queen Answer;)')
+                print(QUEEN_NUM , ' Answer;)')
                 show_state(k_best_state[i])
                 isAns = 1 
                 break
@@ -100,4 +99,6 @@ def main():
 
 
 if __name__ == "__main__":
+    print("Enter number of Queens :")
+    QUEEN_NUM = int(input())
     main()
